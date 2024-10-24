@@ -125,3 +125,8 @@ cfg: # (str, optional) for overriding defaults.yaml
 
 # Tracker settings ------------------------------------------------------------------------------------------------------
 tracker: botsort.yaml # (str) tracker type, choices=[botsort.yaml, bytetrack.yaml]
+
+# Synthetic data settings -----------------------------------------------------------------------------------------------
+synthetic_images_root_dir: # (str) root directory of synthetic images
+synthetic_labels_root_dir: # (str) root directory of synthetic labels
+synthetic_prob: 0.0 # (float) probability of using synthetic data for training

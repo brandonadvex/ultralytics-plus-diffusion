@@ -100,6 +100,9 @@ def build_yolo_dataset(cfg, img_path, batch, data, mode="train", rect=False, str
         classes=cfg.classes,
         data=data,
         fraction=cfg.fraction if mode == "train" else 1.0,
+        synthetic_images_root_dir = cfg.synthetic_images_root_dir,
+        synthetic_labels_root_dir = cfg.synthetic_labels_root_dir,
+        synthetic_prob = cfg.synthetic_prob
     )
 
 
@@ -121,6 +124,9 @@ def build_grounding(cfg, img_path, json_file, batch, mode="train", rect=False, s
         task=cfg.task,
         classes=cfg.classes,
         fraction=cfg.fraction if mode == "train" else 1.0,
+        synthetic_images_root_dir = cfg.synthetic_images_root_dir,
+        synthetic_labels_root_dir = cfg.synthetic_labels_root_dir,
+        synthetic_prob = cfg.synthetic_prob
     )
 
 

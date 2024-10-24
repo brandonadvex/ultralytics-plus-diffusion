@@ -61,16 +61,28 @@ class BaseDataset(Dataset):
         single_cls=False,
         classes=None,
         fraction=1.0,
+        synthetic_images_root_dir=None,
+        synthetic_labels_root_dir=None,
+        synthetic_prob=0.0,
     ):
         """Initialize BaseDataset with given configuration and options."""
         super().__init__()
         self.img_path = img_path
+        self.synthetic_images_root_dir = synthetic_images_root_dir
+        self.synthetic_labels_root_dir = synthetic_labels_root_dir
+        self.synthetic_prob = synthetic_prob
         self.imgsz = imgsz
         self.augment = augment
         self.single_cls = single_cls
         self.prefix = prefix
         self.fraction = fraction
-        self.im_files = self.get_img_files(self.img_path)
+
+        self.real_im_files = self.get_img_files(self.img_path)
+        self.synthetic_im_files = self.get_img_files(
+            self.synthetic_images_root_dir
+        ) if self.synthetic_prob > 0 else []
+        self.im_files = self.real_im_files + self.synthetic_im_files
+
         self.labels = self.get_labels()
         self.update_labels(include_class=classes)  # single_cls and include_class
         self.ni = len(self.labels)  # number of images
@@ -81,6 +93,16 @@ class BaseDataset(Dataset):
         if self.rect:
             assert self.batch_size is not None
             self.set_rectangle()
+
+        self.real_im_files = [
+            x for x in self.real_im_files
+            if x in self.im_files
+        ]
+
+        self.synthetic_im_files = [
+            x for x in self.synthetic_im_files
+            if x in self.im_files
+        ]
 
         # Buffer thread for mosaic images
         self.buffer = []  # buffer size = batch size
@@ -285,6 +307,11 @@ class BaseDataset(Dataset):
 
     def __getitem__(self, index):
         """Returns transformed label information for given index."""
+
+        # modify index based on real probability
+        if random.random() < self.synthetic_prob:
+            index = len(self.real_im_files) + random.randint(0, len(self.synthetic_im_files) - 1)
+
         return self.transforms(self.get_image_and_label(index))
 
     def get_image_and_label(self, index):
@@ -302,7 +329,7 @@ class BaseDataset(Dataset):
 
     def __len__(self):
         """Returns the length of the labels list for the dataset."""
-        return len(self.labels)
+        return len(self.real_im_files)
 
     def update_labels_info(self, label):
         """Custom your label format here."""
