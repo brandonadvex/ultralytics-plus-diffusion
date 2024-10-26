@@ -61,15 +61,13 @@ class BaseDataset(Dataset):
         single_cls=False,
         classes=None,
         fraction=1.0,
-        synthetic_images_root_dir=None,
-        synthetic_labels_root_dir=None,
+        synthetic_images_dir=None,
         synthetic_prob=0.0,
     ):
         """Initialize BaseDataset with given configuration and options."""
         super().__init__()
         self.img_path = img_path
-        self.synthetic_images_root_dir = synthetic_images_root_dir
-        self.synthetic_labels_root_dir = synthetic_labels_root_dir
+        self.synthetic_images_dir = synthetic_images_dir
         self.synthetic_prob = synthetic_prob
         self.imgsz = imgsz
         self.augment = augment
@@ -79,9 +77,13 @@ class BaseDataset(Dataset):
 
         self.real_im_files = self.get_img_files(self.img_path)
         self.synthetic_im_files = self.get_img_files(
-            self.synthetic_images_root_dir
+            self.synthetic_images_dir
         ) if self.synthetic_prob > 0 else []
-        self.im_files = self.real_im_files + self.synthetic_im_files
+
+        self.im_files = (
+            self.real_im_files + 
+            self.synthetic_im_files
+        )
 
         self.labels = self.get_labels()
         self.update_labels(include_class=classes)  # single_cls and include_class
